@@ -5,6 +5,57 @@ import styles from '@/styles/Home.module.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
+Date.prototype.getWeek = function(){
+  var day_miliseconds = 86400000,
+      onejan = new Date(this.getFullYear(),0,1,0,0,0),
+      onejan_day = (onejan.getDay()==0) ? 7 : onejan.getDay(),
+      days_for_next_monday = (8-onejan_day),
+      onejan_next_monday_time = onejan.getTime() + (days_for_next_monday * day_miliseconds),
+      // If one jan is not a monday, get the first monday of the year
+      first_monday_year_time = (onejan_day>1) ? onejan_next_monday_time : onejan.getTime(),
+      this_date = new Date(this.getFullYear(), this.getMonth(),this.getDate(),0,0,0),// This at 00:00:00
+      this_time = this_date.getTime(),
+      days_from_first_monday = Math.round(((this_time - first_monday_year_time) / day_miliseconds));
+
+  var first_monday_year = new Date(first_monday_year_time);
+
+  // We add 1 to "days_from_first_monday" because if "days_from_first_monday" is *7,
+  // then 7/7 = 1, and as we are 7 days from first monday,
+  // we should be in week number 2 instead of week number 1 (7/7=1)
+  // We consider week number as 52 when "days_from_first_monday" is lower than 0,
+  // that means the actual week started before the first monday so that means we are on the firsts
+  // days of the year (ex: we are on Friday 01/01, then "days_from_first_monday"=-3,
+  // so friday 01/01 is part of week number 52 from past year)
+  // "days_from_first_monday<=364" because (364+1)/7 == 52, if we are on day 365, then (365+1)/7 >= 52 (Math.ceil(366/7)=53) and thats wrong
+
+  return (days_from_first_monday>=0 && days_from_first_monday<364) ? Math.ceil((days_from_first_monday+1)/7) : 52;
+}
+
+
+const ParaBlock = (props)=>{
+  return(
+    <div style={styles.ParaBlock}>
+      <span>{props.time} ---- </span><span>{props.title}</span>
+      <p>Кабинет: {props.kab}</p>
+      <p>Преподователь: {props.teacher}</p>
+    </div>
+  )
+}
+
+const DayBlock = ()=>{
+  return(
+    <div>
+      {new Date().getWeek()}
+    </div>
+  )
+}
+
+
+
+
+
+
+
 export default function Home() {
   return (
     <>
@@ -15,108 +66,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        <DayBlock></DayBlock>
       </main>
     </>
   )
